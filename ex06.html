@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="es">
+        <head>
+            <meta charset="utf-8">
+            <script src="js/leap.min.js"></script>
+            <script src="js/jquery-2.0.3.min.js"></script>
+            <title>Example 06: Basic structure for Leap Motion Controller with leap.js</title>
+            <style>
+               body { font-family:"Helvetica","Verdana"; }
+            </style>
+        </head>
+        <body>
+            <h1>Example 06 | Enrique Espejo</h1>
+            <p>Basic structure for Leap Motion Controller with leap.js</p>
+            <script type="text/javascript">
+                var pausedFrame = null;
+                var latestFrame = null;
+                window.onkeypress = function(e) {
+                    if (e.charCode == 32) {
+                        if (pausedFrame == null) {
+                            pausedFrame = latestFrame;
+                        } else {
+                            pausedFrame = null;
+                        }
+                    }
+                };
+                var controller = new Leap.Controller({enableGestures: true});
+                controller.loop(function(frame) {
+                    latestFrame = frame;
+                    document.getElementById('out').innerHTML = (pausedFrame ? "<p><b>PAUSED</b></p>" : "") + "<div>"+(pausedFrame || latestFrame).dump()+"</div>";
+                });
+                controller.on('ready', function() {
+                    console.log("ready");
+                });
+                controller.on('connect', function() {
+                    console.log("connect");
+                });
+                controller.on('disconnect', function() {
+                    console.log("disconnect");
+                });
+                controller.on('focus', function() {
+                    console.log("focus");
+                });
+                controller.on('blur', function() {
+                    console.log("blur");
+                });
+                controller.on('deviceConnected', function() {
+                    console.log("deviceConnected");
+                });
+                controller.on('deviceDisconnected', function() {
+                    console.log("deviceDisconnected");
+                });
+                
+                $("body").on("click",function() { console.log(latestFrame); }); 
+                
+              //  $("body").on("click",function() { alert( $( this ).text() ); });
+            </script>
+        </body>
+        <div id="out"></div>
+        <div id="log"></div>
+</html>

@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="es">
+        <head>
+            <meta charset="utf-8">
+            <script src="js/three.js"></script>
+    		<script src="js/stats.min.js"></script>
+    		<script src="js/dat.gui.min.js"></script>
+            <script src="js/leap.min.js"></script>
+            <script src="js/jquery-2.0.3.min.js"></script>
+            <title>Example 07: Render cubes on fingers with three.js and leap.js</title>
+            <style>
+               body { font-family:"Helvetica","Verdana"; }
+            </style>
+        </head>
+        <body>
+            <h1>Example 07 | Enrique Espejo</h1>
+            <p>Render cubes on fingers with three.js and leap.js</p>
+            <div id="out"></div>
+    		<div id="Stats-output"></div>
+            <script type="text/javascript">
+            	$(function() {
+    				var scene = new THREE.Scene();
+    				var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000); 
+    				var renderer = new THREE.WebGLRenderer();
+    				var stats = initStats();
+    				renderer.setClearColorHex(0xEEEEEE,1.0);
+    				renderer.setSize(window.innerWidth,window.innerHeight);
+    				
+                    
+                    var planeGeometry = new THREE.PlaneGeometry(60,20);
+    				var planeMaterial = new THREE.MeshLambertMaterial({color:0xffffff});
+    				var plane = new THREE.Mesh(planeGeometry,planeMaterial);
+    				plane.receiveShadow = true; 
+    				plane.rotation.x = -0.5 * Math.PI;
+    				plane.position.x = 15;
+    				plane.position.y = 0;
+    				plane.position.z = 0;
+    
+    			//	scene.add(plane);
+                    
+                    var spotLight = new THREE.SpotLight(0xffffff);
+    				spotLight.position.set(-40,60,-10);
+    				spotLight.castShadow = true; 
+    				scene.add(spotLight);
+    
+    				camera.position.x = 0; 
+    				camera.position.y = 40;
+    				camera.position.z = 30;
+    				camera.lookAt(scene.position);
+                    
+                    
+                    var pausedFrame = null;
+                    var latestFrame = null;
+                    window.onkeypress = function(e) {
+                        if (e.charCode == 32) {
+                            if (pausedFrame == null) {
+                                pausedFrame = latestFrame;
+                            } else {
+                                pausedFrame = null;
+                            }
+                        }
+                    };
+                    var controller = new Leap.Controller({enableGestures: true});
+                    controller.loop(function(frame) {
+                        latestFrame = frame;
+//                        document.getElementById('out').innerHTML = (pausedFrame ? "<p><b>PAUSED</b></p>" : "") + "<div>"+(pausedFrame || latestFrame).dump()+"</div>";
+                        
+                    });
+                    controller.on('ready', function() {
+                        console.log("ready");
+                    });
+                    controller.on('connect', function() {
+                        console.log("connect");
+                    });
+                    controller.on('disconnect', function() {
+                        console.log("disconnect");
+                    });
+                    controller.on('focus', function() {
+                        console.log("focus");
+                    });
+                    controller.on('blur', function() {
+                        console.log("blur");
+                    });
+                    controller.on('deviceConnected', function() {
+                        console.log("deviceConnected");
+                    });
+                    controller.on('deviceDisconnected', function() {
+                        console.log("deviceDisconnected");
+                    });
+                    function initStats() {
+    				    var stats = new Stats();
+    				    stats.setMode(0);
+    				    stats.domElement.style.position = "absolute";
+    				    stats.domElement.style.left = "0px";
+    				    stats.domElement.style.top = "0px";
+    				    $("#Stats-output").append(stats.domElement);
+    				    return stats;
+    				}
+    			
+    				var cubos = new Array(); 
+    				
+    				function actualizaCubos() {
+    				    if(latestFrame) {
+        				    if(latestFrame.fingers.length>cubos.length) {
+        				        for(i=cubos.length;i<latestFrame.fingers.length;i++) {
+        				           	var cubeGeometry = new THREE.CubeGeometry(1,1,1);
+                    				var cubeMaterial = new THREE.MeshLambertMaterial({color:0xff0000});
+                    				cubos[i] = new THREE.Mesh(cubeGeometry,cubeMaterial);
+                                    cubos[i].castShadow = true; 
+                    				cubos[i].position.x = i*2; 
+                    				cubos[i].position.y = 0;
+                    				cubos[i].position.z = 0;
+                    
+                    				scene.add(cubos[i]);
+        
+        				        }
+        				    }    
+        				    if(latestFrame.fingers.length<cubos.length) {
+        				        for(i=latestFrame.fingers.length;i<=cubos.length;i++) {
+        				            scene.remove(cubos[i]);
+        				            cubos.pop();
+        				        }
+        				    }
+        				    for(len=latestFrame.fingers.length,i=0;i<len;i++) {
+        				       
+        				        cubos[i].position.x = latestFrame.fingers[i].tipPosition[0]/20;
+        				        cubos[i].position.y = latestFrame.fingers[i].tipPosition[1]/20;
+        				        cubos[i].position.z = latestFrame.fingers[i].tipPosition[2]/20;
+        				    }
+    				    }
+    				}
+    				
+    				function renderScene() {
+    				    
+    				    
+    				    //update the stats
+    				    stats.update();
+    				    actualizaCubos();
+    				    
+    				    
+    				    requestAnimationFrame(renderScene);
+    				    renderer.render(scene,camera);
+    				}
+    				$("#out").append(renderer.domElement);
+    			
+    				
+    				
+    				renderScene();
+                    
+            	});
+            </script>
+        </body>
+    
+</html>
