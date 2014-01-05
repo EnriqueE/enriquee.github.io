@@ -4,14 +4,18 @@
             <meta charset="utf-8">
             <script src="js/leap.min.js"></script>
             <script src="js/jquery-2.0.3.min.js"></script>
+            <link rel="stylesheet" type="text/css" media="all" href="css/estilos.css" />
             <title>Example 06: Basic structure for Leap Motion Controller with leap.js</title>
             <style>
-               body { font-family:"Helvetica","Verdana"; }
+               #out {margin:10px;  }
             </style>
         </head>
         <body>
-            <h1>Example 06 | Enrique Espejo</h1>
-            <p>Basic structure for Leap Motion Controller with leap.js, this examples requires Leap Motion Controller Hardware</p>
+            <header>
+                <h1>Example 06 | Enrique Espejo</h1>
+                <p>Basic structure for Leap Motion Controller with leap.js, this examples requires Leap Motion Controller Hardware</p>
+                <button onclick="document.location.href='index.html'">Índice de ejemplos</button>
+            </header>
             <script type="text/javascript">
                 var pausedFrame = null;
                 var latestFrame = null;
